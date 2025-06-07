@@ -20,6 +20,4 @@ router
   .put(protect, authorizeTodoAccess, updateTodo)
   .delete(protect, authorizeTodoAccess, deleteTodo)
 
-// router.route('/:todoId').get(getTodoById).put(updateTodo).delete(deleteTodo)
-
 module.exports = router

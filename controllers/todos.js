@@ -90,7 +90,7 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
   )
 
   res.status(200).json({
-    succsess: true,
+    success: true,
     data: todo,
   })
 })
@@ -113,7 +113,7 @@ exports.deleteTodo = asyncHandler(async (req, res, next) => {
   await todo.deleteOne()
 
   res.status(200).json({
-    succsess: true,
+    success: true,
     data: {},
   })
 })
