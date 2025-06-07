@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const connectDB = require('./config/db')
-const errorHandler = require('./middleware/errorHandler')
+const errorHandler = require('./middleware/error')
 
 // Routes
 const todosRoutes = require('./routes/todos')

@@ -1,39 +1,46 @@
 const asyncHandler = require('../middleware/async')
 const Todo = require('../models/Todo')
-const MOCK_USER_ID = '665f509e8f22a53bba773ad3' // Replace with a real ObjectId from your DB
+
+const ErrorResponse = require('../utils/errorResponse')
 
 exports.createTodo = asyncHandler(async (req, res, next) => {
-  const todo = await Todo.create({ ...req.body, owner: MOCK_USER_ID })
+  req.body.owner = req.user.id
+  const todo = await Todo.create(req.body)
   res.status(201).json({ success: true, data: todo })
 })
 
 // TODO: add pagination
 exports.getTodos = asyncHandler(async (req, res, next) => {
-  const { status, priority, search, sortBy, page = 1, limit = 10 } = req.query
-  console.log(req)
-  const query = {}
+  // const { status, priority, search, sortBy, page = 1, limit = 10 } = req.query
 
-  if (status) query.status = status
-  if (priority) query.priority = priority
-  if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-    ]
-  }
+  // const query = {}
 
-  const skip = (page - 1) * limit
+  // if (status) query.status = status
+  // if (priority) query.priority = priority
+  // if (search) {
+  // query.$or = [
+  // { title: { $regex: search, $options: 'i' } },
+  // { description: { $regex: search, $options: 'i' } },
+  // ]
+  // }
 
-  const todos = await Todo.find(query)
-    .sort({ [sortBy || 'createdAt']: -1 })
-    .skip(skip)
-    .limit(parseInt(limit))
+  // const skip = (page - 1) * limit
 
-  const total = await Todo.countDocuments(query)
+  // const todos = await Todo.find(query)
+  // .sort({ [sortBy || 'createdAt']: -1 })
+  // .skip(skip)
+  // .limit(parseInt(limit))
+  // const total = await Todo.countDocuments(query)
 
-  res
-    .status(200)
-    .json({ success: true, total, todos, message: 'Sample endpoint working!' })
+  // res
+  //   .status(200)
+  //   .json({ success: true, total, todos, message: 'Sample endpoint working!' })
+  const todos = await Todo.find({ owner: req.user.id })
+  res.status(200).json({
+    success: true,
+    count: todos.length,
+    data: todos,
+  })
 })
 
 // TODO: change to private
@@ -42,16 +49,18 @@ exports.getTodos = asyncHandler(async (req, res, next) => {
 // @acsess  Public
 exports.getTodoById = asyncHandler(async (req, res, next) => {
   const todo = await Todo.findById(req.params.todoId)
+
   if (!todo) {
-    return next(
-      new ErrorResponse(
-        `Todo Not found with the id of ${req.params.todoId}`,
-        404
-      )
-    )
+    return next(new ErrorResponse('Todo not found', 404))
   }
+
+  // Check if current user owns this todo
+  if (todo.owner.toString() !== req.user.id) {
+    return next(new ErrorResponse('Not authorized to access this todo', 403))
+  }
+
   res.status(200).json({
-    succsess: true,
+    success: true,
     data: todo,
   })
 })

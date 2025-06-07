@@ -84,7 +84,7 @@ describe('Auth API', () => {
       password: '654321',
     })
 
-    expect(res.statusCode).toBe(400)
+    expect(res.statusCode).toBe(409)
     expect(res.body.success).toBe(false)
     expect(res.body.error).toMatch('Email already registered')
   })

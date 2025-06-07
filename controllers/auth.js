@@ -10,7 +10,7 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
 
   const existingUser = await User.findOne({ email })
   if (existingUser) {
-    return next(new ErrorResponse('Email already registered', 400))
+    return next(new ErrorResponse('Email already registered', 409))
   }
 
   const user = await User.create({ name, email, password })
