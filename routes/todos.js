@@ -7,6 +7,8 @@ const {
   getTodoById,
   updateTodo,
   deleteTodo,
+  addCollaborator,
+  removeCollaborator,
 } = require('../controllers/todos')
 
 const { protect } = require('../middleware/auth')
@@ -19,5 +21,16 @@ router
   .get(protect, authorizeTodoAccess, getTodoById)
   .put(protect, authorizeTodoAccess, updateTodo)
   .delete(protect, authorizeTodoAccess, deleteTodo)
+
+router.post(
+  '/:todoId/collaborators',
+  protect,
+  authorizeTodoAccess,
+  addCollaborator
+)
+
+router
+  .route('/:todoId/collaborators')
+  .delete(protect, authorizeTodoAccess, removeCollaborator)
 
 module.exports = router
