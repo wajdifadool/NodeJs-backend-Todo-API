@@ -4,6 +4,25 @@ A full-featured collaborative Todo List API built with **Node.js**, **Express**,
 
 ---
 
+## 📝 Description
+
+A full-featured **collaborative Todo List API** built with **Node.js**, **Express**, and **MongoDB**.  
+This is a **simple project** in scope, but it covers **solid fundamentals of backend development**, including:
+
+- RESTful API design
+- User authentication using JWT
+- Role-based access control (RBAC)
+- Middleware composition and reusability
+- Collaboration features between users
+- Subtask management within todos
+- Structured error handling and validation
+- Modular file organization
+- Testing with Jest & Supertest
+
+Ideal for developers looking to understand **clean backend architecture** using the Node.js ecosystem.
+
+---
+
 ## 📁 Table of Contents
 
 - [🚀 Features](#-features)
@@ -47,7 +66,7 @@ A full-featured collaborative Todo List API built with **Node.js**, **Express**,
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/todo-api.git
+git clone https://github.com/wajdifadool/NodeJs-backend-Todo-API
 cd todo-api
 
 # 2. Install dependencies
