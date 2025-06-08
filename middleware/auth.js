@@ -5,6 +5,7 @@ const User = require('../models/User')
 
 // Protect routes
 exports.protect = asyncHandler(async (req, res, next) => {
+  // console.log('middleware protect ran')
   let token
   if (
     req.headers.authorization &&

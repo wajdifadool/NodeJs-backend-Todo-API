@@ -4,7 +4,9 @@ const asyncHandler = require('./async')
 
 const ErrorResponse = require('../utils/errorResponse')
 // Only owner (or collaborator, later) can proceed
+// this is not user any more will be added in the future in more generic way
 exports.authorizeTodoAccess = asyncHandler(async (req, res, next) => {
+  console.log('authorizeTodoAccess ran')
   const todo = await Todo.findById(req.params.todoId)
 
   if (!todo || todo.owner.toString() !== req.user.id) {
@@ -13,6 +15,3 @@ exports.authorizeTodoAccess = asyncHandler(async (req, res, next) => {
 
   next()
 })
-
-// proetect , only loged in users
-// authrize  if model is todo ,,

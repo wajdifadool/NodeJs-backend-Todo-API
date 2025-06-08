@@ -1,5 +1,8 @@
 const express = require('express')
-const { authorizeTodoAccess } = require('../middleware/authorizeTodoAccess')
+
+const { protect } = require('../middleware/auth')
+
+const { checkAccess, loadTodo } = require('../middleware/todosMiddlwares')
 const router = express.Router()
 const {
   getTodos,
@@ -11,26 +14,50 @@ const {
   removeCollaborator,
 } = require('../controllers/todos')
 
-const { protect } = require('../middleware/auth')
+// Include other resource routers
+const subtaskRouter = require('./subtask')
+// Re-route into other resource routers
+router.use('/:todoId/subtasks', subtaskRouter)
 
 router.route('/').post(protect, createTodo)
 router.route('/').get(protect, getTodos)
 
 router
   .route('/:todoId')
-  .get(protect, authorizeTodoAccess, getTodoById)
-  .put(protect, authorizeTodoAccess, updateTodo)
-  .delete(protect, authorizeTodoAccess, deleteTodo)
+  .get(
+    protect,
+    loadTodo,
+    checkAccess({ allowOwner: true, allowCollaborator: true }),
+    getTodoById
+  )
+  .put(
+    protect,
+    loadTodo,
+    checkAccess({ allowOwner: true, allowCollaborator: false }),
+    updateTodo
+  )
+  .delete(
+    protect,
+    loadTodo,
+    checkAccess({ allowOwner: true, allowCollaborator: false }),
+    deleteTodo
+  )
 
 router.post(
   '/:todoId/collaborators',
   protect,
-  authorizeTodoAccess,
+  loadTodo,
+  checkAccess({ allowOwner: true, allowCollaborator: false }),
   addCollaborator
 )
 
 router
   .route('/:todoId/collaborators')
-  .delete(protect, authorizeTodoAccess, removeCollaborator)
+  .delete(
+    protect,
+    loadTodo,
+    checkAccess({ allowOwner: true, allowCollaborator: false }),
+    removeCollaborator
+  )
 
 module.exports = router

@@ -54,22 +54,11 @@ exports.getTodos = asyncHandler(async (req, res, next) => {
 // TODO: change to private
 // @desc    Get single Todo
 // @route   Get /api/v1/todos/:todoId
-// @acsess  Public
+// @acsess  private
 exports.getTodoById = asyncHandler(async (req, res, next) => {
-  const todo = await Todo.findById(req.params.todoId)
-
-  if (!todo) {
-    return next(new ErrorResponse('Todo not found', 404))
-  }
-
-  // Check if current user owns this todo
-  if (todo.owner.toString() !== req.user.id) {
-    return next(new ErrorResponse('Not authorized to access this todo', 403))
-  }
-
   res.status(200).json({
     success: true,
-    data: todo,
+    data: req.todo,
   })
 })
 
@@ -77,17 +66,8 @@ exports.getTodoById = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/todo/:todoId
 // @acsess  Private
 exports.updateTodo = asyncHandler(async (req, res, next) => {
-  let todo = await Todo.findById(req.params.todoId)
-  if (!todo) {
-    return next(
-      new ErrorResponse(
-        `TODO Not found with the id of ${req.params.todoId}`,
-        404
-      )
-    )
-  }
   // do the actual update
-  todo = await Todo.findByIdAndUpdate(
+  req.todo = await Todo.findByIdAndUpdate(
     req.params.todoId,
     { $set: req.body },
     {
@@ -96,10 +76,9 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
       runValidators: true,
     }
   )
-
   res.status(200).json({
     success: true,
-    data: todo,
+    data: req.todo,
   })
 })
 
@@ -107,19 +86,7 @@ exports.updateTodo = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/todo/:todoId
 // @acsess  Private
 exports.deleteTodo = asyncHandler(async (req, res, next) => {
-  const todo = await Todo.findById(req.params.todoId)
-  //   {new:true} : will return the new updated Model
-  if (!todo) {
-    return next(
-      new ErrorResponse(
-        `TODO Not found with the id of ${req.params.todoId}`,
-        404
-      )
-    )
-  }
-
-  await todo.deleteOne()
-
+  await req.todo.deleteOne()
   res.status(200).json({
     success: true,
     data: {},
@@ -130,7 +97,6 @@ exports.deleteTodo = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/todos/:todoId/collaborators
 // @access  Private (Owner only)
 exports.addCollaborator = asyncHandler(async (req, res, next) => {
-  const { todoId } = req.params
   const { collaboratorId } = req.body
 
   if (!collaboratorId) {
@@ -142,11 +108,6 @@ exports.addCollaborator = asyncHandler(async (req, res, next) => {
       new ErrorResponse('Owner can not be added as collaborator', 400)
     )
   }
-  const todo = await Todo.findById(todoId)
-
-  if (!todo) {
-    return next(new ErrorResponse('Todo not found', 404))
-  }
 
   // Check if collaborator exists
   const userToAdd = await User.findById(collaboratorId)
@@ -156,17 +117,17 @@ exports.addCollaborator = asyncHandler(async (req, res, next) => {
   }
 
   // Check if already a collaborator
-  if (todo.collaborators.includes(collaboratorId)) {
+  if (req.todo.collaborators.includes(collaboratorId)) {
     return next(new ErrorResponse('User is already a collaborator', 400))
   }
 
-  todo.collaborators.push(collaboratorId)
+  req.todo.collaborators.push(collaboratorId)
 
-  await todo.save()
+  await req.todo.save()
 
   res.status(200).json({
     success: true,
-    data: todo,
+    data: req.todo,
   })
 })
 
@@ -174,22 +135,15 @@ exports.addCollaborator = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/todos/:todoId/collaborators
 // @access  Private (Owner only)
 exports.removeCollaborator = asyncHandler(async (req, res, next) => {
-  const { todoId } = req.params
   const { collaboratorId } = req.body
 
-  const todo = await Todo.findById(todoId) //TODO:pass via the middleware insted of donloading it twice
-  if (!todo) return next(new ErrorResponse('Todo not found', 404))
-
-  if (todo.owner.toString() !== req.user.id)
-    return next(new ErrorResponse('Not authorized to modify this todo', 403))
-
   // Remove if exists
-  const index = todo.collaborators.indexOf(collaboratorId)
+  const index = req.todo.collaborators.indexOf(collaboratorId)
   if (index === -1)
     return next(new ErrorResponse('Collaborator not found in todo', 400))
 
-  todo.collaborators.splice(index, 1)
-  await todo.save()
+  req.todo.collaborators.splice(index, 1)
+  await req.todo.save()
 
-  res.status(200).json({ success: true, data: todo })
+  res.status(200).json({ success: true, data: req.todo })
 })
