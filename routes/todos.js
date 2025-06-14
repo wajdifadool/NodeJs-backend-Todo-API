@@ -16,8 +16,14 @@ const {
 
 // Include other resource routers
 const subtaskRouter = require('./subtask')
-// Re-route into other resource routers
+const inviationRouter = require('./invite')
+/**
+ * Re-route into other resource routers
+ * Subtask
+ * Invitations:see
+ */
 router.use('/:todoId/subtasks', subtaskRouter)
+router.use('/:todoId/invitations', inviationRouter)
 
 router.route('/').post(protect, createTodo)
 router.route('/').get(protect, getTodos)

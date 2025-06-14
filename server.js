@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/error')
 // Routes
 const todosRoutes = require('./routes/todos')
 const authRoutes = require('./routes/auth')
+const invitationRoutes = require('./routes/invite')
 
 dotenv.config({ path: './config/config.env' })
 

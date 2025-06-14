@@ -143,6 +143,41 @@ npm test
 | success.test.js       | All positive scenario tests         |
 | failure.test.js       | All error & permission denial tests |
 | collaborators.test.js | Collaborator-specific scenarios     |
+| Invitation.test.js    | Invitations-specific scenarios      |
+
+### 🔍 Invitation Feature Testing
+
+This module is covered by a detailed suite of tests using Jest and Supertest. The test suite ensures robust behavior for all typical and edge-case scenarios related to collaborative invitations.
+
+#### ✅ Success Scenarios
+
+1. **Valid Invite & Accept by Intended User**  
+   Flow: User A invites User B → User B accepts.  
+   ✅ Expected: Success response with status 200.w
+
+2. **Token Reuse Attempt After Acceptance**  
+   Flow: Token used twice by invitee.  
+   ✅ Expected: First attempt succeeds, second fails.
+
+#### ❌ Failure Scenarios
+
+3. **Self Invite Attempt (Owner invites themselves)**  
+   🚫 Expected: Rejected with validation error.
+
+4. **Unauthorized Accept Attempt (Wrong user tries token)**  
+   🚫 Expected: Rejected – invitee email mismatch.
+
+5. **Missing Token on Accept**  
+   🚫 Expected: Rejected – token required in body.
+
+6. **Expired Token**  
+   🚫 Expected: Rejected – invite expired.
+
+7. **Owner Accepting Their Own Invitation**  
+   🚫 Expected: Rejected – owner cannot be a collaborator.
+
+8. **Already Collaborator Tries Again**  
+   ✅ Expected: No error – idempotent success response.
 
 ## 🙌 Acknowledgments
 
